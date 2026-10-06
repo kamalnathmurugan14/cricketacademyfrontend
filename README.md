@@ -28,7 +28,7 @@ Spring Boot REST API for the Cricket Academy registration system: user registrat
 
 ## Tech stack
 
-- Java (the root `pom.xml` sets `java.version` to `21.0.3`; Java 17+ works with Spring Boot 3.2 if you set it to `17` or `21`)
+- Java 21 (`java.version` in `pom.xml` is `21`; Java 17+ also works if you change it)
 - Spring Boot 3.2.0: Web, Data JPA, Validation, Security
 - MySQL 8 with `mysql-connector-java` 8.0.33
 - JWT with jjwt 0.11.5
@@ -72,7 +72,7 @@ curl http://localhost:8080/api/auth/health
 
 ## Authentication
 
-- Login returns a JWT. Send it on protected calls as `Authorization: Bearer <token>`.
+- `/auth/login` currently returns a **placeholder token** (`dummy-token-<timestamp>`), not a signed JWT. `JwtUtil` exists but isn't wired into login yet, so protected routes such as `/users/profile` can't be used with the returned token until that is done.
 - Roles: `STUDENT` (default), `COACH`, `ADMIN`.
 - Experience levels: `BEGINNER`, `INTERMEDIATE`, `ADVANCED`, `PROFESSIONAL`.
 - Security rules (`SecurityConfig`): `/auth/**` is public; `/admin/**` needs `ADMIN`; `/coach/**` needs `COACH`; everything else needs authentication. CORS allows any origin pattern with `GET, POST, PUT, DELETE, OPTIONS`.
@@ -125,7 +125,7 @@ TOKEN=$(curl -s -X POST localhost:8080/api/auth/login \
   -d '{"email":"john@example.com","password":"password123"}' | jq -r '.data.token')
 curl -H "Authorization: Bearer $TOKEN" localhost:8080/api/users/profile
 ```
-(The exact name of the token field is defined by the login response in `AuthController`/`UserService.LoginResult`; adjust the `jq` path if it differs.)
+(`data.token` is the field. Because it is a placeholder today, the profile call above returns an error until login issues a real JWT.)
 
 ## Data model
 
@@ -142,7 +142,7 @@ curl -H "Authorization: Bearer $TOKEN" localhost:8080/api/users/profile
 
 1. `GET /auth/validate-email` and `/auth/validate-phone`: confirm availability.
 2. `POST /auth/register`: create the account.
-3. `POST /auth/login`: obtain the JWT (a user who is already logged in gets a `UserAlreadyLoggedIn` error).
+3. `POST /auth/login`: obtain the token (currently a placeholder, see Authentication).
 4. Call `/users/*` with the Bearer token.
 5. Admin users call `/admin/**` routes if added.
 
@@ -150,7 +150,7 @@ curl -H "Authorization: Bearer $TOKEN" localhost:8080/api/users/profile
 
 - **Cannot connect to MySQL**: check the URL, credentials and that `cricket_academy` exists.
 - **401/403**: missing or expired token, or insufficient role.
-- **Wrong Java version**: align `java.version` in `pom.xml` with your installed JDK.
+- **`release version … not supported`**: align `java.version` in `pom.xml` with your installed JDK (it was `21.0.3`, which Maven rejects, and is now `21`).
 - **Port in use**: change `server.port`.
 
 ## Production notes
