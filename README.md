@@ -146,6 +146,16 @@ curl -H "Authorization: Bearer $TOKEN" localhost:8080/api/users/profile
 4. Call `/users/*` with the Bearer token.
 5. Admin users call `/admin/**` routes if added.
 
+## Run in GitHub Codespaces
+
+The repo includes a dev container (`.devcontainer/`) that starts a Java 21 workspace and a MariaDB database, then launches the API automatically.
+
+1. On GitHub, choose **Code → Codespaces → Create codespace on main**.
+2. Wait for the container to build. The API starts on its own and logs to `/tmp/api.log` (`tail -f /tmp/api.log`).
+3. Open the **Ports** tab and open port **8080**. Append `/api/auth/health` to the URL to check it.
+
+The database password and the mail, Infobip and Cashfree values in `.devcontainer/docker-compose.yml` are local placeholders. Emails, SMS and payments need real credentials. To restart the API: `bash .devcontainer/start.sh`. Port 5173 is forwarded for a frontend, but this repository doesn't contain one.
+
 ## Troubleshooting
 
 - **Cannot connect to MySQL**: check the URL, credentials and that `cricket_academy` exists.
