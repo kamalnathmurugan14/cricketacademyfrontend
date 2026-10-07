@@ -1,0 +1,33 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/java:1-21-bookworm
+    command: sleep infinity
+    volumes:
+      - ..:/workspaces/${localWorkspaceFolderBasename}:cached
+    environment:
+      # Local-only database and placeholder integration settings for development
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/cricket_academy?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: codespace
+      SPRING_MAIL_HOST: localhost
+      SPRING_MAIL_PORT: "2525"
+      SPRING_MAIL_USERNAME: dummy
+      SPRING_MAIL_PASSWORD: dummy
+      INFOBIP_API_KEY: dummy
+      INFOBIP_BASE_URL: https://api.infobip.com
+      CASHFREE_APPID: dummy
+      CASHFREE_SECRETKEY: dummy
+      CASHFREE_ENV: sandbox
+      APP_BASE_URL: http://localhost:5173
+    depends_on:
+      - db
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: codespace
+      MARIADB_DATABASE: cricket_academy
+    volumes:
+      - db-data:/var/lib/mysql
+volumes:
+  db-data:
